@@ -2,6 +2,7 @@ using UnityEngine;
 
 public class CarMovement : MonoBehaviour
 {
+    
     // Start is called before the first frame update
     void Start()
     {
@@ -13,11 +14,18 @@ public class CarMovement : MonoBehaviour
     {
         
     }
-//90 up,180right,270 down,0 left (car Facing angles)
-//TODO: if cars angle is in the same direction do the motion.
-    public void Movement(Vector3 direction)
+    public void Movement(Vector3 swipeDirection)
     {
-        Debug.Log(direction+"Deneme");
+        var angleOfDir = (Mathf.FloorToInt(Mathf.Atan2(swipeDirection.x, swipeDirection.z)*Mathf.Rad2Deg));
+        if (angleOfDir == -90) angleOfDir = 270;
+        var angleOfCar = Mathf.FloorToInt(transform.eulerAngles.y);
+        Debug.Log(angleOfDir+" "+ angleOfCar);
+        if (angleOfCar == angleOfDir || angleOfCar == angleOfDir + 180 || angleOfCar == angleOfDir - 180)
+        {
+            Debug.Log(swipeDirection+"Deneme");
+            //start to movement here (via using bool and another method or on here)
+        }
+       
     }
 
     private void OnCollisionEnter(Collision collision)

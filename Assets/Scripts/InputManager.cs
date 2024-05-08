@@ -1,8 +1,4 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Serialization;
-
 public class InputManager : MonoBehaviour
 {
     private Camera _camera;
@@ -37,13 +33,11 @@ public class InputManager : MonoBehaviour
             if (Physics.Raycast(ray, out var hit, 100, mask))
             {
                 selectedCar = hit.transform.GetComponent<CarMovement>();
-                Debug.Log("deneme");
             }
         }
         
         if (touch.phase != TouchPhase.Ended || selectedCar == null ) return;
         var endTouchPos = new Vector3(touch.position.x, 0, touch.position.y);
-        Debug.Log(endTouchPos +""+ _startTouchPosition);
         var swipeDirection = endTouchPos - _startTouchPosition;
         if (Mathf.Abs(swipeDirection.x) > Mathf.Abs(swipeDirection.z))
         {
@@ -56,5 +50,4 @@ public class InputManager : MonoBehaviour
         selectedCar.Movement(_carDirection);
         selectedCar = null;
     }
-    
 }
