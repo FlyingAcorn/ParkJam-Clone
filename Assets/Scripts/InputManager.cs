@@ -16,11 +16,6 @@ public class InputManager : MonoBehaviour
     {
         TouchInput();
     }
-
-    private void Movement()
-    {
-        
-    }
 //TODO: Add swipe sensitivity to the touch input.
     private void TouchInput()
     {
@@ -47,7 +42,7 @@ public class InputManager : MonoBehaviour
         {
             _carDirection = swipeDirection.z >0 ? new Vector3(0,0,1) : new Vector3(0,0,-1);
         }
-        selectedCar.Movement(_carDirection);
+        selectedCar.MovementController(_carDirection);
         selectedCar = null;
     }
 }
