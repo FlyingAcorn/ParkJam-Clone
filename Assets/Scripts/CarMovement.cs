@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using DG.Tweening;
 using UnityEngine;
@@ -50,7 +51,7 @@ public class CarMovement : MonoBehaviour
         _movementCoroutine = null;
     }
 
-    private IEnumerator RoadMovement()
+    private IEnumerator RoadMovement(int idx)
     {
         //initial part.
         var startPoint = transform.position;
@@ -64,10 +65,28 @@ public class CarMovement : MonoBehaviour
             var lerp=TransformExtensions.QuadraticLerp(startPoint, middlePoint, endpoint, InterpolationAmount);
             transform.LookAt(!_isMovingReverse ? lerp: 2*transform.position-lerp);
             transform.position = lerp;
-            
             yield return null;
         }
         
+        var roadPoints = RoadManager.Instance.roadPoints;
+        for (int i = idx; i < roadPoints.Length; i++)
+        {
+            Debug.Log(idx);
+            while (transform.position != roadPoints[i].endPoint.position)
+            {
+                // here you can put lerp to make the proper movement
+                yield return null;
+
+            }
+            if (i+1 != roadPoints.Length)
+            {
+                while (transform.position != roadPoints[i+1].startPoint.position)
+                {
+                    //Here you need to do quadratic lerp to make the curve and use lookat to make the rotation turn
+                    yield return null;
+                }
+            }
+        }
         
     }
     
@@ -85,8 +104,9 @@ public class CarMovement : MonoBehaviour
     {
         if (trigger.transform.TryGetComponent(out Road road))
         {
+           var idx= Array.IndexOf(RoadManager.Instance.roadPoints, road);
             _stopMovement = true;
-            _movementCoroutine = StartCoroutine(RoadMovement());
+            _movementCoroutine = StartCoroutine(RoadMovement(idx));
         }
     }
 }
