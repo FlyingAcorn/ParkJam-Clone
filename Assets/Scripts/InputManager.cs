@@ -1,5 +1,5 @@
 using UnityEngine;
-public class InputManager : MonoBehaviour
+public class InputManager : Singleton<InputManager>
 {
     private Camera _camera;
     public LayerMask mask;
