@@ -8,9 +8,25 @@ public class CarMovement : MonoBehaviour
      [SerializeField] private float speed;
      private Coroutine _movementCoroutine;
      private Vector3 _swipeDirection;
-    
+     private float _interpolationAmount;
+
+     public float InterpolationAmount
+     {
+         get => _interpolationAmount;
+         set
+         {
+             if (value ==1)
+             {
+                 _interpolationAmount = 0;
+             }
+             else
+             {
+                 _interpolationAmount = value;
+             }
+         }
+     }
      private bool _isMovingReverse;
-     
+    
     public void MovementController(Vector3 swipeDirection)
     {
         if (_movementCoroutine != null) return;
@@ -36,16 +52,23 @@ public class CarMovement : MonoBehaviour
 
     private IEnumerator RoadMovement()
     {
-        //cars movement when we reach to the road.
-        if (!_isMovingReverse)
+        //initial part.
+        var startPoint = transform.position;
+        var middlePoint = transform.position + _swipeDirection * 3.75f;
+        var endpoint = !_isMovingReverse ? 
+            middlePoint + (Quaternion.Euler(0, 90, 0) * _swipeDirection * 2) :
+            middlePoint + (Quaternion.Euler(0, -90, 0) * _swipeDirection * 2);
+        while (transform.position !=endpoint)
         {
+            InterpolationAmount += Time.deltaTime % 1f;
+            var lerp=TransformExtensions.QuadraticLerp(startPoint, middlePoint, endpoint, InterpolationAmount);
+            transform.LookAt(!_isMovingReverse ? lerp: 2*transform.position-lerp);
+            transform.position = lerp;
             
+            yield return null;
         }
-        else
-        {
-            
-        }
-        yield break;
+        
+        
     }
     
     private void OnCollisionEnter(Collision collision)
@@ -55,7 +78,6 @@ public class CarMovement : MonoBehaviour
         _stopMovement = true;
         collision.transform.DOPunchPosition(_swipeDirection*0.5f, 0.5f, 1);
         transform.Translate(-_swipeDirection*0.5f,Space.World);
-        //you should change transform.Translate for polish reasons.
 
     }
 
@@ -64,6 +86,7 @@ public class CarMovement : MonoBehaviour
         if (trigger.transform.TryGetComponent(out Road road))
         {
             _stopMovement = true;
+            _movementCoroutine = StartCoroutine(RoadMovement());
         }
     }
 }
