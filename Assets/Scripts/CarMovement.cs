@@ -55,7 +55,7 @@ public class CarMovement : MonoBehaviour
 
     private IEnumerator RoadMovement(int idx)
     {
-        //initial part.
+        //Arranging car to the road.
         var startPoint = transform.position;
         var middlePoint = transform.position + _swipeDirection * 3.75f;
         var endpoint = !_isMovingReverse ? 
@@ -70,14 +70,13 @@ public class CarMovement : MonoBehaviour
             yield return null;
         }
         var roadPoints = RoadManager.Instance.roadPoints;
+        //Linear movement for each side
         for (int i = idx; i < roadPoints.Length; i++)
         {
-            Debug.Log(idx);
             InterpolationAmount = 0;
             startPoint = transform.position;
             while (transform.position != roadPoints[i].endPoint.position)
             {
-                // here you can put lerp to make the proper movement
                 InterpolationAmount += Time.deltaTime % 1f;
                 var lerp = Vector3.Lerp(startPoint, roadPoints[i].endPoint.position,
                     InterpolationAmount);
@@ -86,21 +85,25 @@ public class CarMovement : MonoBehaviour
                 yield return null;
 
             }
-            
             if (i+1 != roadPoints.Length)
             {
+                //Turning part.
                 startPoint = transform.position;
                 InterpolationAmount = 0;
-                Debug.Log(Vector3.Normalize(roadPoints[i].endPoint.position));
+                //Using trigonometry regions to arrange vector points.
+                bool region = roadPoints[i].transform.eulerAngles.y == 90 || roadPoints[i].transform.eulerAngles.y == 270;
+                var intersectionPoint = region ? 
+                    new Vector3(roadPoints[i].endPoint.position.x, 0, roadPoints[i + 1].startPoint.position.z) 
+                    :
+                    new Vector3(roadPoints[i+1].startPoint.position.x, 0, roadPoints[i].endPoint.position.z);
+                
                 while (transform.position != roadPoints[i+1].startPoint.position)
                 {
-                    //TODO: Road movement done needs polish and could be better check this tomorrow.
-                    //TODO: Transition position needs to be perfect to make a nice curve.Calculate it.
                     InterpolationAmount += Time.deltaTime % 1f;
-                    var lerp =TransformExtensions.QuadraticLerp(startPoint, roadPoints[i].transitionPoint.position,
+                    var lerp =TransformExtensions.QuadraticLerp(startPoint, intersectionPoint,
                         roadPoints[i + 1].startPoint.position, InterpolationAmount);
                     transform.LookAt(lerp);
-                    transform.position =lerp;
+                    transform.position=lerp;
                     yield return null;
                 }
             }
