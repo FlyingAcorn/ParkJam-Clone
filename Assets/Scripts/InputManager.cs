@@ -28,6 +28,7 @@ public class InputManager : Singleton<InputManager>
             if (Physics.Raycast(ray, out var hit, 100, mask))
             {
                 selectedCar = hit.transform.GetComponent<CarMovement>();
+                
             }
         }
         

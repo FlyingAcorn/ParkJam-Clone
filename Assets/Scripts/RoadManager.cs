@@ -8,7 +8,8 @@ public class RoadManager : Singleton<RoadManager>
         base.Awake();
         GetRoadPoints();
     }
-
+    
+    
     private void GetRoadPoints()
     {
         roadPoints = new Road[transform.childCount];

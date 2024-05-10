@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using DG.Tweening;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class CarMovement : MonoBehaviour
@@ -10,7 +11,7 @@ public class CarMovement : MonoBehaviour
      private Coroutine _movementCoroutine;
      private Vector3 _swipeDirection;
      private float _interpolationAmount;
-
+    
      public float InterpolationAmount
      {
          get => _interpolationAmount;
@@ -38,6 +39,7 @@ public class CarMovement : MonoBehaviour
         if (angleOfCar != angleOfDir && angleOfCar != angleOfDir + 180 && angleOfCar != angleOfDir - 180) return;
         _isMovingReverse = angleOfDir != angleOfCar;
         _movementCoroutine = StartCoroutine(Movement());
+        
     }
 
     private IEnumerator Movement()
@@ -67,22 +69,38 @@ public class CarMovement : MonoBehaviour
             transform.position = lerp;
             yield return null;
         }
-        
         var roadPoints = RoadManager.Instance.roadPoints;
         for (int i = idx; i < roadPoints.Length; i++)
         {
             Debug.Log(idx);
+            InterpolationAmount = 0;
+            startPoint = transform.position;
             while (transform.position != roadPoints[i].endPoint.position)
             {
                 // here you can put lerp to make the proper movement
+                InterpolationAmount += Time.deltaTime % 1f;
+                var lerp = Vector3.Lerp(startPoint, roadPoints[i].endPoint.position,
+                    InterpolationAmount);
+                transform.LookAt(lerp);
+                transform.position = lerp;
                 yield return null;
 
             }
+            
             if (i+1 != roadPoints.Length)
             {
+                startPoint = transform.position;
+                InterpolationAmount = 0;
+                Debug.Log(Vector3.Normalize(roadPoints[i].endPoint.position));
                 while (transform.position != roadPoints[i+1].startPoint.position)
                 {
-                    //Here you need to do quadratic lerp to make the curve and use lookat to make the rotation turn
+                    //TODO: Road movement done needs polish and could be better check this tomorrow.
+                    //TODO: Transition position needs to be perfect to make a nice curve.Calculate it.
+                    InterpolationAmount += Time.deltaTime % 1f;
+                    var lerp =TransformExtensions.QuadraticLerp(startPoint, roadPoints[i].transitionPoint.position,
+                        roadPoints[i + 1].startPoint.position, InterpolationAmount);
+                    transform.LookAt(lerp);
+                    transform.position =lerp;
                     yield return null;
                 }
             }
@@ -97,7 +115,6 @@ public class CarMovement : MonoBehaviour
         _stopMovement = true;
         collision.transform.DOPunchPosition(_swipeDirection*0.5f, 0.5f, 1);
         transform.Translate(-_swipeDirection*0.5f,Space.World);
-
     }
 
     private void OnTriggerEnter(Collider trigger)
@@ -109,4 +126,5 @@ public class CarMovement : MonoBehaviour
             _movementCoroutine = StartCoroutine(RoadMovement(idx));
         }
     }
+    
 }
