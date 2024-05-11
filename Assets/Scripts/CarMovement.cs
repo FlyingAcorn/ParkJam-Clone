@@ -1,11 +1,12 @@
 using System;
 using System.Collections;
+using System.Net.Http.Headers;
 using DG.Tweening;
 using UnityEngine;
 
 public class CarMovement : MonoBehaviour
 {
-     private bool _stopMovement;
+    private bool _stopMovement = true;
      [SerializeField] private float speed;
      private Coroutine _movementCoroutine;
      private Vector3 _swipeDirection;
@@ -105,9 +106,14 @@ public class CarMovement : MonoBehaviour
     {
         if (!collision.transform.TryGetComponent(out CarMovement _) &&
             !collision.transform.TryGetComponent(out Obstacle _)) return;
+        if (!_stopMovement)
+        {
+            var region = transform.eulerAngles.y == 90 || transform.eulerAngles.y == 270;
+            transform.Translate(-_swipeDirection*0.5f,Space.World);
+            collision.transform.DOPunchRotation((region ?  new Vector3(_swipeDirection.z,0,_swipeDirection.x) : _swipeDirection) * 20, 4,1);
+            transform.DOPunchRotation((region ? _swipeDirection  : new Vector3(_swipeDirection.z,0,_swipeDirection.x)) * 20, 4,1);
+        }
         _stopMovement = true;
-        collision.transform.DOPunchPosition(_swipeDirection*0.5f, 0.5f, 1);
-        transform.Translate(-_swipeDirection*0.5f,Space.World);
     }
 
     private void OnTriggerEnter(Collider trigger)
