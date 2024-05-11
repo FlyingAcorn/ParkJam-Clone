@@ -35,7 +35,8 @@ public class InputManager : Singleton<InputManager>
         if (touch.phase != TouchPhase.Ended || selectedCar == null ) return;
         var endTouchPos = new Vector3(touch.position.x, 0, touch.position.y);
         var swipeDirection = endTouchPos - _startTouchPosition;
-        if (Mathf.Abs(swipeDirection.x) > Mathf.Abs(swipeDirection.z))
+        if (Mathf.Abs(swipeDirection.z) > Mathf.Abs(swipeDirection.x))
+            // depending on the cameras rotation z and x swaps positions to align the swipe direction.
         {
             _carDirection = swipeDirection.x >0 ? Vector3.right : Vector3.left;
         }

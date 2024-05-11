@@ -15,6 +15,10 @@ public class GameManager : Singleton<GameManager>
         Victory
     }
     public GameState state;
+    public List<Level> levels;
+
+    public Level currentLevel;
+    
 
     public void UpdateGameState(GameState newState)
     {

@@ -1,7 +1,6 @@
 using System;
 using System.Collections;
 using DG.Tweening;
-using Unity.VisualScripting;
 using UnityEngine;
 
 public class CarMovement : MonoBehaviour
@@ -35,6 +34,7 @@ public class CarMovement : MonoBehaviour
         _swipeDirection = swipeDirection;
         var angleOfDir = (Mathf.FloorToInt(Mathf.Atan2(swipeDirection.x, swipeDirection.z)*Mathf.Rad2Deg));
         if (angleOfDir == -90) angleOfDir = 270;
+        Debug.Log(angleOfDir);
         var angleOfCar = Mathf.FloorToInt(transform.eulerAngles.y);
         if (angleOfCar != angleOfDir && angleOfCar != angleOfDir + 180 && angleOfCar != angleOfDir - 180) return;
         _isMovingReverse = angleOfDir != angleOfCar;
@@ -55,9 +55,14 @@ public class CarMovement : MonoBehaviour
 
     private IEnumerator RoadMovement(int idx)
     {
+        var roadPoints = RoadManager.Instance.roadPoints;
         //Arranging car to the road.
         var startPoint = transform.position;
-        var middlePoint = transform.position + _swipeDirection * 3.75f;
+        bool region = roadPoints[idx].transform.eulerAngles.y == 90 || roadPoints[idx].transform.eulerAngles.y == 270;
+        var middlePoint = region ? 
+            new Vector3(roadPoints[idx].startPoint.position.x, 0, transform.position.z) 
+            :
+            new Vector3(transform.position.x, 0, roadPoints[idx].startPoint.position.z);
         var endpoint = !_isMovingReverse ? 
             middlePoint + (Quaternion.Euler(0, 90, 0) * _swipeDirection * 2) :
             middlePoint + (Quaternion.Euler(0, -90, 0) * _swipeDirection * 2);
@@ -69,7 +74,7 @@ public class CarMovement : MonoBehaviour
             transform.position = lerp;
             yield return null;
         }
-        var roadPoints = RoadManager.Instance.roadPoints;
+        
         //Linear movement for each side
         for (int i = idx; i < roadPoints.Length; i++)
         {
@@ -91,7 +96,7 @@ public class CarMovement : MonoBehaviour
                 startPoint = transform.position;
                 InterpolationAmount = 0;
                 //Using trigonometry regions to arrange vector points.
-                bool region = roadPoints[i].transform.eulerAngles.y == 90 || roadPoints[i].transform.eulerAngles.y == 270;
+                 region = roadPoints[i].transform.eulerAngles.y == 90 || roadPoints[i].transform.eulerAngles.y == 270;
                 var intersectionPoint = region ? 
                     new Vector3(roadPoints[i].endPoint.position.x, 0, roadPoints[i + 1].startPoint.position.z) 
                     :
