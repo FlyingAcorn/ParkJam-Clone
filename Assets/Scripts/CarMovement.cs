@@ -10,22 +10,7 @@ public class CarMovement : MonoBehaviour
      private Coroutine _movementCoroutine;
      private Vector3 _swipeDirection;
      private float _interpolationAmount;
-    
-     public float InterpolationAmount
-     {
-         get => _interpolationAmount;
-         set
-         {
-             if (value ==1)
-             {
-                 _interpolationAmount = 0;
-             }
-             else
-             {
-                 _interpolationAmount = value;
-             }
-         }
-     }
+     private RoadManager _road;
      private bool _isMovingReverse;
     
     public void MovementController(Vector3 swipeDirection)
@@ -55,7 +40,7 @@ public class CarMovement : MonoBehaviour
 
     private IEnumerator RoadMovement(int idx)
     {
-        var roadPoints = RoadManager.Instance.roadPoints;
+        var roadPoints = _road.roadPoints;
         //Arranging car to the road.
         var startPoint = transform.position;
         bool region = roadPoints[idx].transform.eulerAngles.y == 90 || roadPoints[idx].transform.eulerAngles.y == 270;
@@ -68,8 +53,8 @@ public class CarMovement : MonoBehaviour
             middlePoint + (Quaternion.Euler(0, -90, 0) * _swipeDirection * 2);
         while (transform.position !=endpoint)
         {
-            InterpolationAmount += Time.deltaTime % 1f;
-            var lerp=TransformExtensions.QuadraticLerp(startPoint, middlePoint, endpoint, InterpolationAmount);
+            _interpolationAmount += Time.deltaTime % 1f;
+            var lerp=TransformExtensions.QuadraticLerp(startPoint, middlePoint, endpoint, _interpolationAmount);
             transform.LookAt(!_isMovingReverse ? lerp: 2*transform.position-lerp);
             transform.position = lerp;
             yield return null;
@@ -78,13 +63,13 @@ public class CarMovement : MonoBehaviour
         //Linear movement for each side
         for (int i = idx; i < roadPoints.Length; i++)
         {
-            InterpolationAmount = 0;
+            _interpolationAmount = 0;
             startPoint = transform.position;
             while (transform.position != roadPoints[i].endPoint.position)
             {
-                InterpolationAmount += Time.deltaTime % 1f;
+                _interpolationAmount += Time.deltaTime % 1f;
                 var lerp = Vector3.Lerp(startPoint, roadPoints[i].endPoint.position,
-                    InterpolationAmount);
+                    _interpolationAmount);
                 transform.LookAt(lerp);
                 transform.position = lerp;
                 yield return null;
@@ -94,7 +79,7 @@ public class CarMovement : MonoBehaviour
             {
                 //Turning part.
                 startPoint = transform.position;
-                InterpolationAmount = 0;
+                _interpolationAmount = 0;
                 //Using trigonometry regions to arrange vector points.
                  region = roadPoints[i].transform.eulerAngles.y == 90 || roadPoints[i].transform.eulerAngles.y == 270;
                 var intersectionPoint = region ? 
@@ -104,9 +89,9 @@ public class CarMovement : MonoBehaviour
                 
                 while (transform.position != roadPoints[i+1].startPoint.position)
                 {
-                    InterpolationAmount += Time.deltaTime % 1f;
+                    _interpolationAmount += Time.deltaTime % 1f;
                     var lerp =TransformExtensions.QuadraticLerp(startPoint, intersectionPoint,
-                        roadPoints[i + 1].startPoint.position, InterpolationAmount);
+                        roadPoints[i + 1].startPoint.position, _interpolationAmount);
                     transform.LookAt(lerp);
                     transform.position=lerp;
                     yield return null;
@@ -129,7 +114,8 @@ public class CarMovement : MonoBehaviour
     {
         if (trigger.transform.TryGetComponent(out Road road))
         {
-           var idx= Array.IndexOf(RoadManager.Instance.roadPoints, road);
+            _road = road.GetComponentInParent<RoadManager>();
+           var idx= Array.IndexOf(_road.roadPoints, road);
             _stopMovement = true;
             _movementCoroutine = StartCoroutine(RoadMovement(idx));
         }

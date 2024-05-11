@@ -1,11 +1,11 @@
 using UnityEngine;
 
-public class RoadManager : Singleton<RoadManager>
+public class RoadManager : MonoBehaviour
 {
     public Road[] roadPoints;
-    protected override void Awake()
+    private void Awake()
     {
-        base.Awake();
+        
         GetRoadPoints();
     }
     
