@@ -99,19 +99,21 @@ public class CarMovement : MonoBehaviour
                 }
             }
         }
-        
+        GameManager.Instance.parkedVehicles.Remove(this);
+        if (GameManager.Instance.parkedVehicles.Count == 0) GameManager.Instance.UpdateGameState(GameManager.GameState.Victory);
     }
     
     private void OnCollisionEnter(Collision collision)
     {
         if (!collision.transform.TryGetComponent(out CarMovement _) &&
             !collision.transform.TryGetComponent(out Obstacle _)) return;
+        if (_road != null) return;
         if (!_stopMovement)
         {
             var region = transform.eulerAngles.y == 90 || transform.eulerAngles.y == 270;
             transform.Translate(-_swipeDirection*0.5f,Space.World);
-            collision.transform.DOPunchRotation((region ?  new Vector3(_swipeDirection.z,0,_swipeDirection.x) : _swipeDirection) * 20, 4,1);
-            transform.DOPunchRotation((region ? _swipeDirection  : new Vector3(_swipeDirection.z,0,_swipeDirection.x)) * 20, 4,1);
+            collision.transform.DOPunchRotation((region ?  new Vector3(_swipeDirection.z,0,_swipeDirection.x) : _swipeDirection) * 20, 0.5f);
+            transform.DOPunchRotation((region ? _swipeDirection  : new Vector3(_swipeDirection.z,0,_swipeDirection.x)) * 20, 0.5f);
         }
         _stopMovement = true;
     }

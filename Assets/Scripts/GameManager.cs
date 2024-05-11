@@ -6,6 +6,7 @@ using UnityEngine;
 public class GameManager : Singleton<GameManager>
 {
     public static event Action<GameState> OnGameStateChanged;
+    
     public enum  GameState
     {
         Play,
@@ -18,7 +19,24 @@ public class GameManager : Singleton<GameManager>
     public List<Level> levels;
 
     public Level currentLevel;
+    public List<CarMovement> parkedVehicles;
+
+    protected override void Awake()
+    {
+        base.Awake();
+        UpdateGameState(GameState.Play);
+    }
     
+    
+    
+    private void VehicleList()
+    {
+        var array = currentLevel.GetComponentsInChildren<CarMovement>();
+        foreach (var t in array)
+        {
+            parkedVehicles.Add(t);
+        }
+    }
 
     public void UpdateGameState(GameState newState)
     {
@@ -29,7 +47,7 @@ public class GameManager : Singleton<GameManager>
         }
         if (newState == GameState.Play)
         {
-            
+            VehicleList();
         }if (newState == GameState.Settings)
         {
             
