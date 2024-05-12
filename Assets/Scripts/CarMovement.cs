@@ -1,6 +1,5 @@
 using System;
 using System.Collections;
-using System.Net.Http.Headers;
 using DG.Tweening;
 using UnityEngine;
 
@@ -13,6 +12,7 @@ public class CarMovement : MonoBehaviour
      private float _interpolationAmount;
      private RoadManager _road;
      private bool _isMovingReverse;
+     private bool _isCloseToEndPointOnTurn;
     
     public void MovementController(Vector3 swipeDirection)
     {
@@ -54,7 +54,7 @@ public class CarMovement : MonoBehaviour
             middlePoint + (Quaternion.Euler(0, -90, 0) * _swipeDirection * 2);
         while (transform.position !=endpoint)
         {
-            _interpolationAmount += Time.deltaTime % 1f;
+            _interpolationAmount += speed * (1 / Vector3.Distance(startPoint, endpoint) * Time.deltaTime);
             var lerp=TransformExtensions.QuadraticLerp(startPoint, middlePoint, endpoint, _interpolationAmount);
             transform.LookAt(!_isMovingReverse ? lerp: 2*transform.position-lerp);
             transform.position = lerp;
@@ -64,18 +64,22 @@ public class CarMovement : MonoBehaviour
         //Linear movement for each side
         for (int i = idx; i < roadPoints.Length; i++)
         {
-            _interpolationAmount = 0;
-            startPoint = transform.position;
-            while (transform.position != roadPoints[i].endPoint.position)
+            // the reason of the boolean "turning"  is to prevent object from moving when its close to the turning point.
+            if (!_isCloseToEndPointOnTurn)
             {
-                _interpolationAmount += Time.deltaTime % 1f;
-                var lerp = Vector3.Lerp(startPoint, roadPoints[i].endPoint.position,
-                    _interpolationAmount);
-                transform.LookAt(lerp);
-                transform.position = lerp;
-                yield return null;
-
+                _interpolationAmount = 0;
+                startPoint = transform.position;
+                while (transform.position != roadPoints[i].endPoint.position)
+                {
+                    _interpolationAmount += speed * (1 / Vector3.Distance(startPoint, roadPoints[i].endPoint.position) * Time.deltaTime);
+                    var lerp = Vector3.Lerp(startPoint, roadPoints[i].endPoint.position,
+                        _interpolationAmount);
+                    transform.LookAt(lerp);
+                    transform.position = lerp;
+                    yield return null;
+                }
             }
+            _isCloseToEndPointOnTurn = false;
             if (i+1 != roadPoints.Length)
             {
                 //Turning part.
@@ -87,10 +91,9 @@ public class CarMovement : MonoBehaviour
                     new Vector3(roadPoints[i].endPoint.position.x, 0, roadPoints[i + 1].startPoint.position.z) 
                     :
                     new Vector3(roadPoints[i+1].startPoint.position.x, 0, roadPoints[i].endPoint.position.z);
-                
                 while (transform.position != roadPoints[i+1].startPoint.position)
                 {
-                    _interpolationAmount += Time.deltaTime % 1f;
+                    _interpolationAmount += speed * (1 / Vector3.Distance(startPoint, roadPoints[i+1].startPoint.position) * Time.deltaTime);
                     var lerp =TransformExtensions.QuadraticLerp(startPoint, intersectionPoint,
                         roadPoints[i + 1].startPoint.position, _interpolationAmount);
                     transform.LookAt(lerp);
@@ -120,6 +123,10 @@ public class CarMovement : MonoBehaviour
 
     private void OnTriggerEnter(Collider trigger)
     {
+        if (trigger.transform.TryGetComponent( out RoadsEndPointTrigger check ))
+        {
+            _isCloseToEndPointOnTurn = true;
+        }
         if (trigger.transform.TryGetComponent(out Road road))
         {
             _road = road.GetComponentInParent<RoadManager>();
