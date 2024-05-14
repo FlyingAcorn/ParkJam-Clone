@@ -1,14 +1,16 @@
 using UnityEngine;
+using UnityEngine.Serialization;
+
 public class InputManager : Singleton<InputManager>
 {
-    private Camera _camera;
+    public Camera mainCamera;
     public LayerMask mask;
     private Vector3 _carDirection;
     private Vector3 _startTouchPosition;
     [SerializeField] private CarMovement selectedCar;
     void Start()
     {
-        _camera = Camera.main;
+        mainCamera = Camera.main;
     }
 
     // Update is called once per frame
@@ -23,7 +25,7 @@ public class InputManager : Singleton<InputManager>
         var touch = Input.GetTouch(0);
         if (touch.phase == TouchPhase.Began)
         {
-            Ray ray = _camera.ScreenPointToRay(touch.position);
+            Ray ray = mainCamera.ScreenPointToRay(touch.position);
             _startTouchPosition = new Vector3(touch.position.x, 0, touch.position.y);
             if (Physics.Raycast(ray, out var hit, 100, mask))
             {

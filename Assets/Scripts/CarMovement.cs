@@ -55,7 +55,7 @@ public class CarMovement : MonoBehaviour
         while (transform.position !=endpoint)
         {
             _interpolationAmount += speed * (1 / Vector3.Distance(startPoint, endpoint) * Time.deltaTime);
-            var lerp=TransformExtensions.QuadraticLerp(startPoint, middlePoint, endpoint, _interpolationAmount);
+            var lerp=Extensions.QuadraticLerp(startPoint, middlePoint, endpoint, _interpolationAmount);
             transform.LookAt(!_isMovingReverse ? lerp: 2*transform.position-lerp);
             transform.position = lerp;
             yield return null;
@@ -94,7 +94,7 @@ public class CarMovement : MonoBehaviour
                 while (transform.position != roadPoints[i+1].startPoint.position)
                 {
                     _interpolationAmount += speed * (1 / Vector3.Distance(startPoint, roadPoints[i+1].startPoint.position) * Time.deltaTime);
-                    var lerp =TransformExtensions.QuadraticLerp(startPoint, intersectionPoint,
+                    var lerp =Extensions.QuadraticLerp(startPoint, intersectionPoint,
                         roadPoints[i + 1].startPoint.position, _interpolationAmount);
                     transform.LookAt(lerp);
                     transform.position=lerp;
