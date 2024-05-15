@@ -27,7 +27,7 @@ public class GameManager : Singleton<GameManager>
     protected override void Awake()
     {
         base.Awake();
-       currentLevel = Instantiate(levels[PlayerPrefs.GetInt(_lastPlayedLevel)]);
+      // currentLevel = Instantiate(levels[PlayerPrefs.GetInt(_lastPlayedLevel)]);
         UpdateGameState(GameState.Play);
     }
     private void VehicleList()
@@ -62,7 +62,6 @@ public class GameManager : Singleton<GameManager>
             currentLevel.gameObject.SetActive(false);
            Extensions.UpdateInt(_levelNum, x => x + 1);
            var idx = PlayerPrefs.GetInt(_levelNum) >= levels.Count ? Random.Range(0, 3) : PlayerPrefs.GetInt(_levelNum);
-           Debug.Log(idx);
            currentLevel = Instantiate(levels[idx]); 
             InputManager.Instance.mainCamera = Camera.main;
             PlayerPrefs.SetInt(_lastPlayedLevel,idx);

@@ -310,8 +310,8 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 1, y: 0.65579945, z: 2.4513645}
-  m_Center: {x: 7.461672e-17, y: 0.32722828, z: -0.025999308}
+  m_Size: {x: 1, y: 0.7516543, z: 2.4513645}
+  m_Center: {x: 0, y: 0.37515578, z: -0.025999308}
 --- !u!54 &4866444005625325960
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -352,6 +352,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   speed: 10
+  maxDisCarInFront: 3.5
+  radiusForSphereCast: 1
+  lineCastDistance: 3.5
+  lineCastHalfLength: 3.2
+  castTargetMask:
+    serializedVersion: 2
+    m_Bits: 128
 --- !u!1 &5508901632423457381
 GameObject:
   m_ObjectHideFlags: 0

@@ -266,6 +266,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   speed: 10
+  maxDisCarInFront: 5.2
+  radiusForSphereCast: 2
+  lineCastDistance: 4.5
+  lineCastHalfLength: 3.2
+  castTargetMask:
+    serializedVersion: 2
+    m_Bits: 128
 --- !u!1 &8646387668758489527
 GameObject:
   m_ObjectHideFlags: 0
