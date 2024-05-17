@@ -3,13 +3,13 @@ using UnityEngine;
 public class RoadManager : MonoBehaviour
 {
     public Road[] roadPoints;
+
     private void Awake()
     {
-        
         GetRoadPoints();
     }
-    
-    
+
+
     private void GetRoadPoints()
     {
         roadPoints = new Road[transform.childCount];

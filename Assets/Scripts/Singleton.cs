@@ -1,8 +1,7 @@
-
 using UnityEngine;
 
 public class Singleton<T> : MonoBehaviour
-  where T : Component
+    where T : Component
 {
     private static T _instance;
 
@@ -13,14 +12,16 @@ public class Singleton<T> : MonoBehaviour
             if (_instance == null)
             {
                 var objs = FindObjectsOfType(typeof(T)) as T[];
-                if (objs is {Length: > 0})
+                if (objs is { Length: > 0 })
                 {
                     _instance = objs[0];
                 }
-                if (objs is {Length: > 1})
+
+                if (objs is { Length: > 1 })
                 {
                     Debug.LogError("There is more than one " + typeof(T).Name + " in the scene.");
                 }
+
                 if (_instance != null) return _instance;
                 var obj = new GameObject
                 {
@@ -28,12 +29,14 @@ public class Singleton<T> : MonoBehaviour
                 };
                 _instance = obj.AddComponent<T>();
             }
+
             return _instance;
         }
     }
+
     protected virtual void Awake()
     {
-        if (_instance ==null)
+        if (_instance == null)
         {
             _instance = this as T;
             DontDestroyOnLoad(gameObject);
@@ -43,5 +46,4 @@ public class Singleton<T> : MonoBehaviour
             Destroy(gameObject);
         }
     }
-    
 }
