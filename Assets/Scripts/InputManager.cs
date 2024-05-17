@@ -23,7 +23,8 @@ public class InputManager : Singleton<InputManager>
 //TODO: Add swipe sensitivity to the touch input.
     private void TouchInput()
     {
-        if (Input.touchCount != 1) return;
+        
+        if (Input.touchCount != 1 || GameManager.Instance.state != GameManager.GameState.Play) return;
         var touch = Input.GetTouch(0);
         if (touch.phase == TouchPhase.Began)
         {
