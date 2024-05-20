@@ -26,7 +26,6 @@ public class CarMovement : MonoBehaviour
         _swipeDirection = swipeDirection;
         var angleOfDir = (Mathf.FloorToInt(Mathf.Atan2(swipeDirection.x, swipeDirection.z) * Mathf.Rad2Deg));
         if (angleOfDir == -90) angleOfDir = 270;
-        Debug.Log(angleOfDir);
         var angleOfCar = Mathf.FloorToInt(transform.eulerAngles.y);
         if (angleOfCar != angleOfDir && angleOfCar != angleOfDir + 180 && angleOfCar != angleOfDir - 180) return;
         _isMovingReverse = angleOfDir != angleOfCar;
@@ -119,7 +118,6 @@ public class CarMovement : MonoBehaviour
                 }
             }
         }
-
         GameManager.Instance.parkedVehicles.Remove(this);
         transform.gameObject.SetActive(false);
         if (GameManager.Instance.parkedVehicles.Count == 0)
@@ -151,7 +149,6 @@ public class CarMovement : MonoBehaviour
         if (Physics.SphereCastNonAlloc(transform.position + transform.forward * maxDisCarInFront,
                 radiusForSphereCast, transform.forward, hits, 0, castTargetMask) != 0)
         {
-            Debug.Log(hits[0].transform.name);
             return true;
         }
 

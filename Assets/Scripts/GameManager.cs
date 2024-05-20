@@ -1,5 +1,7 @@
 using System;
 using System.Collections.Generic;
+using UnityEngine;
+using Random = UnityEngine.Random;
 
 public class GameManager : Singleton<GameManager>
 {
@@ -14,16 +16,29 @@ public class GameManager : Singleton<GameManager>
 
     public GameState state;
     public List<Level> levels;
-    public string levelNum = "levelNum";
-    public string lastPlayedLevel = "lastPlayerLevel";
+    public readonly string levelNum = "levelNum";
+    public readonly string lastPlayedLevel = "lastPlayedLevel";
+    public readonly string coinAmount = "coinAmount";
+    public int totalCoins;
     public Level currentLevel;
     public List<CarMovement> parkedVehicles;
 
     protected override void Awake()
-    {
+    { 
         base.Awake();
-        // currentLevel = Instantiate(levels[PlayerPrefs.GetInt(_lastPlayedLevel)]);
+        currentLevel = Instantiate(levels[PlayerPrefs.GetInt(lastPlayedLevel)]);
+        
+    }
+
+    private void Start()
+    {
         UpdateGameState(GameState.Play);
+        if (PlayerPrefs.GetInt(levelNum) == 0)
+        {
+            PlayerPrefs.SetInt(levelNum,1);
+        }
+        UIManager.Instance.panels[3].panelTexts[0].text = "Level " + (PlayerPrefs.GetInt(levelNum));
+        
     }
 
     private void VehicleList()
@@ -42,7 +57,13 @@ public class GameManager : Singleton<GameManager>
         
         if (newState == GameState.Play)
         {
-            VehicleList();
+            if (parkedVehicles.Count == 0)
+            {
+                VehicleList();
+            }
+            UIManager.Instance.OpenPanel(UIManager.Instance.panels[3]);
+            
+            
         }
 
         if (newState == GameState.Settings)
@@ -52,10 +73,11 @@ public class GameManager : Singleton<GameManager>
         
         if (newState == GameState.Victory)
         {
+            
+            Extensions.UpdateInt(coinAmount, x => x+Random.Range(50,101));
             UIManager.Instance.OpenPanel(UIManager.Instance.panels[1]);
             Extensions.UpdateInt(levelNum, x => x + 1);
-            // add random amount of coin
-            
+            UIManager.Instance.UpdateCoins();
         }
 
         OnGameStateChanged?.Invoke(newState);
