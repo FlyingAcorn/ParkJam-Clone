@@ -16,29 +16,51 @@ public class GameManager : Singleton<GameManager>
 
     public GameState state;
     public List<Level> levels;
-    public readonly string levelNum = "levelNum";
-    public readonly string lastPlayedLevel = "lastPlayedLevel";
-    public readonly string coinAmount = "coinAmount";
     public int totalCoins;
     public Level currentLevel;
     public List<CarMovement> parkedVehicles;
 
+    public int CoinsAmount
+    {
+        get => PlayerPrefs.GetInt("Coin", 0);
+        private set
+        {
+            if (value >= 999)
+            {
+                PlayerPrefs.SetInt("Coin", 999);
+            }
+            else
+            {
+                PlayerPrefs.SetInt("Coin", value);
+            }
+        }
+    }
+
+    public int LevelNo
+    {
+        get => PlayerPrefs.GetInt("Level", 1);
+        private set => PlayerPrefs.SetInt("Level", value);
+    }
+
+
+    public int LastPlayedLevel
+    {
+        get => PlayerPrefs.GetInt("LastPlayedLevel", 0);
+        private set => PlayerPrefs.SetInt("LastPlayedLevel", value);
+    }
+
     protected override void Awake()
-    { 
+    {
         base.Awake();
-        currentLevel = Instantiate(levels[PlayerPrefs.GetInt(lastPlayedLevel)]);
-        
+        currentLevel = Instantiate(levels[LastPlayedLevel]);
     }
 
     private void Start()
     {
         UpdateGameState(GameState.Play);
-        if (PlayerPrefs.GetInt(levelNum) == 0)
-        {
-            PlayerPrefs.SetInt(levelNum,1);
-        }
-        UIManager.Instance.panels[3].panelTexts[0].text = "Level " + (PlayerPrefs.GetInt(levelNum));
-        
+        totalCoins = CoinsAmount;
+        UIManager.Instance.UpdateCoins();
+        UIManager.Instance.panels[3].panelTexts[0].text = "Level " + LevelNo;
     }
 
     private void VehicleList()
@@ -54,30 +76,31 @@ public class GameManager : Singleton<GameManager>
     public void UpdateGameState(GameState newState)
     {
         state = newState;
-        
+
         if (newState == GameState.Play)
         {
             if (parkedVehicles.Count == 0)
             {
                 VehicleList();
             }
+
             UIManager.Instance.OpenPanel(UIManager.Instance.panels[3]);
-            
-            
         }
 
         if (newState == GameState.Settings)
         {
-            
         }
-        
+
         if (newState == GameState.Victory)
         {
-            
-            Extensions.UpdateInt(coinAmount, x => x+Random.Range(50,101));
+            LevelNo++;
+            UIManager.Instance.panels[3].panelTexts[0].text = "Level " + LevelNo;
+            CoinsAmount += Random.Range(50, 101);
             UIManager.Instance.OpenPanel(UIManager.Instance.panels[1]);
-            Extensions.UpdateInt(levelNum, x => x + 1);
             UIManager.Instance.UpdateCoins();
+            LastPlayedLevel = LevelNo > levels.Count
+                ? Random.Range(0, levels.Count)
+                : LevelNo - 1;
         }
 
         OnGameStateChanged?.Invoke(newState);

@@ -118,6 +118,7 @@ public class CarMovement : MonoBehaviour
                 }
             }
         }
+
         GameManager.Instance.parkedVehicles.Remove(this);
         transform.gameObject.SetActive(false);
         if (GameManager.Instance.parkedVehicles.Count == 0)
