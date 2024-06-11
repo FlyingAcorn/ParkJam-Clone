@@ -1,9 +1,13 @@
 using System.Collections;
 using DG.Tweening;
 using UnityEngine;
+using UnityEngine.UI;
+
 public class UIManager : Singleton<UIManager>
 {
     public Panel[] panels;
+    [SerializeField] private Image emojiObject;
+    
 
     // panel indexes = setting 0,victory 1, tutorial 2 , inplay 3
     //TODO: Cars will have random emoji popups,fill empty methods and implement the proper tweens of the panels and emojis
@@ -136,6 +140,15 @@ public class UIManager : Singleton<UIManager>
         HapticsManager.Instance.disableHaptics = !tog;
     }
 
+    public void EmojiPopupOnCrash(Vector3 movingObject,Vector3 hitObject,bool isObstacle)
+    {
+       var screenPoint1 =  RectTransformUtility.WorldToScreenPoint(Camera.current,movingObject);
+       Instantiate(emojiObject, new Vector3(screenPoint1.x, screenPoint1.y),Quaternion.identity,panels[3].transform);
+       if (isObstacle) return;
+       var screenPoint2 =  RectTransformUtility.WorldToScreenPoint(Camera.current,hitObject);
+       Instantiate(emojiObject, new Vector3(screenPoint2.x, screenPoint2.y),Quaternion.identity,panels[3].transform);
+    }
+
     public void UpdateCoins()
     {
         DOVirtual.Int(GameManager.Instance.totalCoins, GameManager.Instance.CoinsAmount, 2, (x) =>
@@ -144,5 +157,6 @@ public class UIManager : Singleton<UIManager>
             panels[1].panelTexts[1].text = "+" + x;
         });
         panels[0].panelTexts[0].text = GameManager.Instance.CoinsAmount.ToString();
+        
     }
 }

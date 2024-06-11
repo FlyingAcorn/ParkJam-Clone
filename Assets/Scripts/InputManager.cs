@@ -6,7 +6,7 @@ public class InputManager : Singleton<InputManager>
     public LayerMask mask;
     private Vector3 _carDirection;
     private Vector3 _startTouchPosition;
-    [SerializeField] private CarMovement selectedCar;
+    public CarMovement selectedCar;
 
     void Start()
     {
