@@ -1,9 +1,6 @@
 using System.Collections;
 using DG.Tweening;
 using UnityEngine;
-using UnityEngine.UIElements;
-using Image = UnityEngine.UI.Image;
-
 public class UIManager : Singleton<UIManager>
 {
     public Panel[] panels;
@@ -36,8 +33,7 @@ public class UIManager : Singleton<UIManager>
         gameManager.UpdateGameState(GameManager.GameState.Play);
         OpenPanel(panels[3]);
     }
-
-
+    
     public void OpenPanel(Panel panel)
     {
         if (panel == panels[0])
@@ -131,10 +127,13 @@ public class UIManager : Singleton<UIManager>
 
     public void ToggleSound(bool tog)
     {
+        SoundManager.Instance.audioSource.mute =!tog;
     }
 
     public void ToggleHaptics(bool tog)
     {
+        //its just a placeholder
+        HapticsManager.Instance.disableHaptics = !tog;
     }
 
     public void UpdateCoins()
