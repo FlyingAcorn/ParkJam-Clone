@@ -61,6 +61,7 @@ public class GameManager : Singleton<GameManager>
         totalCoins = CoinsAmount;
         UIManager.Instance.UpdateCoins();
         UIManager.Instance.panels[3].panelTexts[0].text = "Level " + LevelNo;
+        if (LevelNo == 1) StartCoroutine(UIManager.Instance.TutorialSequence());
     }
 
     private void VehicleList()

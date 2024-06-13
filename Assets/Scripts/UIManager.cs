@@ -7,11 +7,7 @@ public class UIManager : Singleton<UIManager>
 {
     public Panel[] panels;
     [SerializeField] private Image emojiObject;
-    
-
     // panel indexes = setting 0,victory 1, tutorial 2 , inplay 3
-    //TODO: Cars will have random emoji popups,fill empty methods and implement the proper tweens of the panels and emojis
-    //TODO: Implement a system that corrects the tutorial panels image to a specific vehicle also give animations to the images.
     // TODO: You can add a panel that that will pop up and give daily random coin on opening game (make a state for it)
     // you should do animation and tween related stuff in seperate methods.(tutorial is missing for now)
     public void RestartLevel()
@@ -37,7 +33,7 @@ public class UIManager : Singleton<UIManager>
         gameManager.UpdateGameState(GameManager.GameState.Play);
         OpenPanel(panels[3]);
     }
-    
+
     public void OpenPanel(Panel panel)
     {
         if (panel == panels[0])
@@ -120,6 +116,27 @@ public class UIManager : Singleton<UIManager>
         }
     }
 
+    public IEnumerator TutorialSequence() // you can do a better system later
+    {
+        panels[2].gameObject.SetActive(true);
+        var selectedVehicle =
+            GameManager.Instance.parkedVehicles[Random.Range(0, GameManager.Instance.parkedVehicles.Count)];
+        var screenPoint1 = RectTransformUtility.WorldToScreenPoint(Camera.main, selectedVehicle.transform.position);
+        foreach (var image in panels[2].panelElements)
+        {
+            transform.position = new Vector3(screenPoint1.x, screenPoint1.y+150);
+        }
+        panels[2].panelElements[0].transform.DOLocalMoveY
+            (panels[2].panelElements[0].transform.localPosition.y + 10, 1).SetLoops(12, LoopType.Yoyo);
+        panels[2].panelElements[1].transform.DOLocalMoveX
+            (panels[2].panelElements[1].transform.localPosition.x + 25, 1).SetLoops(12, LoopType.Yoyo);
+        panels[2].panelElements[2].transform.DOLocalMoveX
+            (panels[2].panelElements[2].transform.localPosition.x -25, 1).SetLoops(12, LoopType.Yoyo);
+        yield return new WaitForSeconds(12);
+        panels[2].gameObject.SetActive(false);
+        
+    }
+
     public void DeleteCache()
     {
         PlayerPrefs.DeleteAll();
@@ -131,7 +148,7 @@ public class UIManager : Singleton<UIManager>
 
     public void ToggleSound(bool tog)
     {
-        SoundManager.Instance.audioSource.mute =!tog;
+        SoundManager.Instance.audioSource.mute = !tog;
     }
 
     public void ToggleHaptics(bool tog)
@@ -140,12 +157,12 @@ public class UIManager : Singleton<UIManager>
         HapticsManager.Instance.disableHaptics = !tog;
     }
 
-    public void EmojiPopupOnCrash(Vector3 movingObject,Vector3 hitObject)
+    public void EmojiPopupOnCrash(Vector3 movingObject, Vector3 hitObject)
     {
-       var screenPoint1 =  RectTransformUtility.WorldToScreenPoint(Camera.main,movingObject);
-       Instantiate(emojiObject, new Vector3(screenPoint1.x, screenPoint1.y),Quaternion.identity,panels[3].transform);
-       var screenPoint2 =  RectTransformUtility.WorldToScreenPoint(Camera.main,hitObject);
-       Instantiate(emojiObject, new Vector3(screenPoint2.x, screenPoint2.y),Quaternion.identity,panels[3].transform);
+        var screenPoint1 = RectTransformUtility.WorldToScreenPoint(Camera.main, movingObject);
+        Instantiate(emojiObject, new Vector3(screenPoint1.x, screenPoint1.y), Quaternion.identity, panels[3].transform);
+        var screenPoint2 = RectTransformUtility.WorldToScreenPoint(Camera.main, hitObject);
+        Instantiate(emojiObject, new Vector3(screenPoint2.x, screenPoint2.y), Quaternion.identity, panels[3].transform);
     }
 
     public void UpdateCoins()
@@ -156,6 +173,5 @@ public class UIManager : Singleton<UIManager>
             panels[1].panelTexts[1].text = "+" + x;
         });
         panels[0].panelTexts[0].text = GameManager.Instance.CoinsAmount.ToString();
-        
     }
 }
