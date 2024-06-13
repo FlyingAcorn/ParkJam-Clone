@@ -23,5 +23,6 @@ public class EmojiPopup : MonoBehaviour
         _myImage.DOFade(0, 2);
         yield return new WaitForSeconds(2);
         Destroy(gameObject);
+        
     }
 }

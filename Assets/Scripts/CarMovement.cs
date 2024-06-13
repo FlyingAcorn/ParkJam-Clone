@@ -122,7 +122,11 @@ public class CarMovement : MonoBehaviour
         GameManager.Instance.parkedVehicles.Remove(this);
         transform.gameObject.SetActive(false);
         if (GameManager.Instance.parkedVehicles.Count == 0)
+        {
+            SoundManager.Instance.PlaySfx(2);
             GameManager.Instance.UpdateGameState(GameManager.GameState.Victory);
+        }
+         
     }
 
     private bool CheckCarsOnRoad()
@@ -139,6 +143,7 @@ public class CarMovement : MonoBehaviour
             transform.DOPunchRotation(transform.right * 2, 0.5f);
             _stopMovement = true;
             UIManager.Instance.EmojiPopupOnCrash(transform.position,hit.transform.position);
+            SoundManager.Instance.PlaySfx(0);
             return true;
         }
 
@@ -185,7 +190,7 @@ public class CarMovement : MonoBehaviour
             transform.DOPunchRotation(
                 (region ? _swipeDirection : new Vector3(_swipeDirection.z, 0, _swipeDirection.x)) * 20, 0.5f);
         }
-
+        SoundManager.Instance.PlaySfx(1);
         _stopMovement = true;
     }
 
