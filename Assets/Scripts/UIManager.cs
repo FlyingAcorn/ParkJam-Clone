@@ -140,12 +140,11 @@ public class UIManager : Singleton<UIManager>
         HapticsManager.Instance.disableHaptics = !tog;
     }
 
-    public void EmojiPopupOnCrash(Vector3 movingObject,Vector3 hitObject,bool isObstacle)
+    public void EmojiPopupOnCrash(Vector3 movingObject,Vector3 hitObject)
     {
-       var screenPoint1 =  RectTransformUtility.WorldToScreenPoint(Camera.current,movingObject);
+       var screenPoint1 =  RectTransformUtility.WorldToScreenPoint(Camera.main,movingObject);
        Instantiate(emojiObject, new Vector3(screenPoint1.x, screenPoint1.y),Quaternion.identity,panels[3].transform);
-       if (isObstacle) return;
-       var screenPoint2 =  RectTransformUtility.WorldToScreenPoint(Camera.current,hitObject);
+       var screenPoint2 =  RectTransformUtility.WorldToScreenPoint(Camera.main,hitObject);
        Instantiate(emojiObject, new Vector3(screenPoint2.x, screenPoint2.y),Quaternion.identity,panels[3].transform);
     }
 

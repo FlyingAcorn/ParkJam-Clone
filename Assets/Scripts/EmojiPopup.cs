@@ -1,6 +1,4 @@
-using System;
 using System.Collections;
-using System.Collections.Generic;
 using DG.Tweening;
 using JetBrains.Annotations;
 using UnityEngine;
@@ -21,10 +19,9 @@ public class EmojiPopup : MonoBehaviour
 
     private IEnumerator EmojiSequence()
     {
-        
         transform.DOLocalMoveY(transform.localPosition.y + 50,2);
         _myImage.DOFade(0, 2);
         yield return new WaitForSeconds(2);
-        Destroy(this);
+        Destroy(gameObject);
     }
 }

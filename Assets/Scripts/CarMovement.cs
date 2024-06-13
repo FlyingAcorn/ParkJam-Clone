@@ -30,7 +30,7 @@ public class CarMovement : MonoBehaviour
         if (angleOfCar != angleOfDir && angleOfCar != angleOfDir + 180 && angleOfCar != angleOfDir - 180) return;
         _isMovingReverse = angleOfDir != angleOfCar;
         _movementCoroutine = StartCoroutine(Movement());
-    }
+    }                
 
     private IEnumerator Movement()
     {
@@ -133,11 +133,12 @@ public class CarMovement : MonoBehaviour
         var lineCastEnd = !_isMovingReverse
             ? transform.forward * lineCastDistance - transform.right * lineCastHalfLength + transform.up
             : -(transform.forward * lineCastDistance - transform.right * lineCastHalfLength * 2) + transform.up;
-        if (Physics.Linecast(transform.position + lineCastStart, transform.position + lineCastEnd, castTargetMask))
+        if (Physics.Linecast(transform.position + lineCastStart, transform.position + lineCastEnd, out RaycastHit hit, castTargetMask))
         {
             transform.Translate(-_swipeDirection * 0.3f, Space.World);
             transform.DOPunchRotation(transform.right * 2, 0.5f);
             _stopMovement = true;
+            UIManager.Instance.EmojiPopupOnCrash(transform.position,hit.transform.position);
             return true;
         }
 
