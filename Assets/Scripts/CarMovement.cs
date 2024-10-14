@@ -2,10 +2,12 @@ using System;
 using System.Collections;
 using DG.Tweening;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 public class CarMovement : MonoBehaviour
 {
-    private bool _stopMovement = true;
+    public bool gotBumped;
+    public bool stopMovement = true;
     [SerializeField] private float speed;
     private Coroutine _movementCoroutine;
     private Vector3 _swipeDirection;
@@ -34,9 +36,10 @@ public class CarMovement : MonoBehaviour
 
     private IEnumerator Movement()
     {
-        _stopMovement = false;
-        while (!_stopMovement)
+        stopMovement = false;
+        while (!stopMovement)
         {
+            yield return new WaitUntil(() => GameManager.Instance.state == GameManager.GameState.Play);
             transform.position += _swipeDirection * (speed * Time.deltaTime);
             yield return null;
         }
@@ -59,6 +62,8 @@ public class CarMovement : MonoBehaviour
             : middlePoint + (Quaternion.Euler(0, -90, 0) * _swipeDirection * 2);
         while (transform.position != endpoint)
         {
+            yield return new WaitUntil(() => gotBumped == false);
+            yield return new WaitUntil(() => GameManager.Instance.state == GameManager.GameState.Play);
             _interpolationAmount += speed * (1 / Vector3.Distance(startPoint, endpoint) * Time.deltaTime);
             var lerp = Extensions.QuadraticLerp(startPoint, middlePoint, endpoint, _interpolationAmount);
             transform.LookAt(!_isMovingReverse ? lerp : 2 * transform.position - lerp);
@@ -76,6 +81,7 @@ public class CarMovement : MonoBehaviour
                 startPoint = transform.position;
                 while (transform.position != roadPoints[i].endPoint.position)
                 {
+                    yield return new WaitUntil(() => GameManager.Instance.state == GameManager.GameState.Play);
                     if (!CheckCarsInFront())
                     {
                         _interpolationAmount += speed *
@@ -104,6 +110,7 @@ public class CarMovement : MonoBehaviour
                     : new Vector3(roadPoints[i + 1].startPoint.position.x, 0, roadPoints[i].endPoint.position.z);
                 while (transform.position != roadPoints[i + 1].startPoint.position)
                 {
+                     yield return new WaitUntil(() => GameManager.Instance.state == GameManager.GameState.Play);
                     if (!CheckCarsInFront())
                     {
                         _interpolationAmount += speed * (1 /
@@ -143,7 +150,7 @@ public class CarMovement : MonoBehaviour
         {
             transform.Translate(-_swipeDirection * 0.3f, Space.World);
             transform.DOPunchRotation(transform.right * 2, 0.5f);
-            _stopMovement = true;
+            stopMovement = true;
             UIManager.Instance.EmojiPopupOnCrash(transform.position,hit.transform.position);
             SoundManager.Instance.PlaySfx(0);
             return true;
@@ -180,20 +187,22 @@ public class CarMovement : MonoBehaviour
 
     private void OnCollisionEnter(Collision collision)
     {
-        if (!collision.transform.TryGetComponent(out CarMovement _) &&
+        if (!collision.transform.TryGetComponent(out CarMovement car) &&
             !collision.transform.TryGetComponent(out Obstacle _)) return;
         if (_road != null) return;
-        if (!_stopMovement)
+        if (!stopMovement)
         {
             var region = transform.eulerAngles.y == 90 || transform.eulerAngles.y == 270;
             transform.Translate(-_swipeDirection * 0.5f, Space.World);
             collision.transform.DOPunchRotation(
-                (region ? new Vector3(_swipeDirection.z, 0, _swipeDirection.x) : _swipeDirection) * 20, 0.5f);
+                (region ? new Vector3(_swipeDirection.z, 0, _swipeDirection.x) : _swipeDirection) * 20, 0.5f).
+                OnPlay(() => { car.gotBumped = true;}).
+                OnComplete(() => { car.gotBumped = false;});
             transform.DOPunchRotation(
                 (region ? _swipeDirection : new Vector3(_swipeDirection.z, 0, _swipeDirection.x)) * 20, 0.5f);
         }
         SoundManager.Instance.PlaySfx(1);
-        _stopMovement = true;
+        stopMovement = true;
     }
 
     private void OnTriggerEnter(Collider trigger)
@@ -208,7 +217,7 @@ public class CarMovement : MonoBehaviour
             if (CheckCarsOnRoad()) return;
             _road = road.GetComponentInParent<RoadManager>();
             var idx = Array.IndexOf(_road.roadPoints, road);
-            _stopMovement = true;
+            stopMovement = true;
             _movementCoroutine = StartCoroutine(RoadMovement(idx));
         }
     }
