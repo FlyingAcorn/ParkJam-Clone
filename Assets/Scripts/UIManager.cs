@@ -7,7 +7,7 @@ public class UIManager : Singleton<UIManager>
 {
     public Panel[] panels;
     [SerializeField] private Image emojiObject;
-    // panel indexes = setting 0,victory 1, tutorial 2 , inplay 3
+    // panel indexes = setting 0,victory 1, tutorial 2 , inplay 3, shop 4, mainmenu 5, daily Reward 6
     // TODO: You can add a panel that that will pop up and give daily random coin on opening game (make a state for it)
     // you should do animation and tween related stuff in seperate methods.(tutorial is missing for now)
     public void RestartLevel()
@@ -36,17 +36,34 @@ public class UIManager : Singleton<UIManager>
 
     public void OpenPanel(Panel panel)
     {
-        if (panel == panels[0])
+        if (panel == panels[0]) // settings
         {
             ClosePanel(panels[3]);
             GameManager.Instance.UpdateGameState(GameManager.GameState.Settings);
             StartCoroutine(SettingsPanelCoroutine());
         }
-        else if (panel == panels[1])
+        else if (panel == panels[1]) // victory
         {
             ClosePanel(panels[3]);
             ClosePanel(panels[1]);
             StartCoroutine(VictoryPanelCoroutine());
+        }
+        else if (panel == panels[4]) // shop
+        {
+            ClosePanel(panels[3]);
+            GameManager.Instance.UpdateGameState(GameManager.GameState.Settings);
+             // shop routine
+        }
+        else if (panel == panels[5]) // main menu
+        {
+            // bir tane level gibi yap arabalar sürekli hareket edip gelsin
+            // menu biraz saydam olsun
+            // başka bir gamescene de yapabilirsin
+        }
+        else if (panel == panels[6]) // daily rewards
+        {
+             // yukarı doğru kaysın
+             // main menu sahnesinde çıksın
         }
         else
         {
@@ -86,7 +103,7 @@ public class UIManager : Singleton<UIManager>
 
     public void ClosePanel(Panel panel)
     {
-        if (panel == panels[0])
+        if (panel == panels[0]) // settings
         {
             OpenPanel(panels[3]);
             panels[0].gameObject.transform.DOLocalMoveX(1080, 0.5f);
@@ -95,7 +112,7 @@ public class UIManager : Singleton<UIManager>
                 GameManager.Instance.UpdateGameState(GameManager.GameState.Play);
             }
         }
-        else if (panel == panels[1])
+        else if (panel == panels[1]) // victory
         {
             foreach (var t in panels[1].panelTexts)
             {
@@ -109,6 +126,26 @@ public class UIManager : Singleton<UIManager>
 
             panel.buttons[0].gameObject.SetActive(false);
             panel.gameObject.SetActive(false);
+        }
+        else if (panel == panels[4]) // shop
+        {
+            OpenPanel(panels[3]);
+            panels[0].gameObject.transform.DOLocalMoveX(1080, 0.5f);
+            if (GameManager.Instance.state != GameManager.GameState.Victory)
+            {
+                GameManager.Instance.UpdateGameState(GameManager.GameState.Play);
+            }
+        }
+        else if (panel == panels[5]) // main menu
+        {
+             // bir tane level gibi yap arabalar sürekli hareket edip gelsin
+             // menu biraz saydam olsun
+             // başka bir gamescene de yapabilirsin
+        }
+        else if (panel == panels[6]) // daily Rewards
+        {
+            // main menu sahnesinde çıksın
+            // aşağıya doğru kaysın
         }
         else
         {
@@ -135,6 +172,11 @@ public class UIManager : Singleton<UIManager>
         yield return new WaitForSeconds(12);
         panels[2].gameObject.SetActive(false);
         
+    }
+
+    public void LeaveGame()
+    {
+        Application.Quit();
     }
 
     public void DeleteCache()
