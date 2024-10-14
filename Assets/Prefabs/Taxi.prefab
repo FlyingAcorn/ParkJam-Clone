@@ -438,7 +438,7 @@ MonoBehaviour:
   speed: 10
   maxDisCarInFront: 3.5
   radiusForSphereCast: 1
-  lineCastDistance: 3.5
+  lineCastDistance: 3.2
   lineCastHalfLength: 3.2
   castTargetMask:
     serializedVersion: 2

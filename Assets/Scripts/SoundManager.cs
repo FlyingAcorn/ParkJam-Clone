@@ -14,8 +14,6 @@ public class SoundManager : Singleton<SoundManager>
         if (audioSource.isPlaying && audioClips[clip] == _sfx) return;
         _sfx = audioClips[clip];
         audioSource.PlayOneShot(_sfx);
-        Debug.Log("playing sound");
-
     }
     
 }

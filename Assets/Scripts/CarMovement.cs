@@ -131,8 +131,10 @@ public class CarMovement : MonoBehaviour
 
     private bool CheckCarsOnRoad()
     {
+        Debug.Log("deniyor");
         var lineCastStart = !_isMovingReverse
-            ? transform.forward * lineCastDistance + transform.right * lineCastHalfLength + transform.up
+            ? 
+            transform.forward * lineCastDistance + transform.right * lineCastHalfLength* 2 + transform.up
             : -(transform.forward * lineCastDistance + transform.right * lineCastHalfLength) + transform.up;
         var lineCastEnd = !_isMovingReverse
             ? transform.forward * lineCastDistance - transform.right * lineCastHalfLength + transform.up
