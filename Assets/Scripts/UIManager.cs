@@ -174,6 +174,20 @@ public class UIManager : Singleton<UIManager>
         
     }
 
+    public void StartGame()
+    {   panels[5].gameObject.SetActive(false);
+        GameManager.Instance.currentLevel = Instantiate(GameManager.Instance.levels[GameManager.Instance.LastPlayedLevel]);
+        GameManager.Instance.UpdateGameState(GameManager.GameState.Play);
+        GameManager.Instance.totalCoins = GameManager.Instance.CoinsAmount;
+        UpdateCoins();
+        panels[3].panelTexts[0].text = "Level " + GameManager.Instance.LevelNo;
+        if (GameManager.Instance.LevelNo == 1) StartCoroutine(UIManager.Instance.TutorialSequence());
+        
+        if (GameManager.Instance.parkedVehicles.Count == 0)
+        {
+            GameManager.Instance.VehicleList();
+        }
+    }
     public void LeaveGame()
     {
         Application.Quit();

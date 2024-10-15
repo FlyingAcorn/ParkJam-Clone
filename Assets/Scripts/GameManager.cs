@@ -9,6 +9,7 @@ public class GameManager : Singleton<GameManager>
 
     public enum GameState
     {
+        MainMenu,
         Play,
         Settings,
         Victory
@@ -52,19 +53,15 @@ public class GameManager : Singleton<GameManager>
     protected override void Awake()
     {
         base.Awake();
-        currentLevel = Instantiate(levels[LastPlayedLevel]);
+        
     }
 
     private void Start()
     {
-        UpdateGameState(GameState.Play);
-        totalCoins = CoinsAmount;
-        UIManager.Instance.UpdateCoins();
-        UIManager.Instance.panels[3].panelTexts[0].text = "Level " + LevelNo;
-        if (LevelNo == 1) StartCoroutine(UIManager.Instance.TutorialSequence());
+        UpdateGameState(GameState.MainMenu);
     }
 
-    private void VehicleList()
+    public void VehicleList()
     {
         var array = currentLevel.GetComponentsInChildren<CarMovement>();
         foreach (var t in array)
@@ -78,13 +75,13 @@ public class GameManager : Singleton<GameManager>
     {
         state = newState;
 
+        if (newState == GameState.MainMenu)
+        {
+            
+        }
+
         if (newState == GameState.Play)
         {
-            if (parkedVehicles.Count == 0)
-            {
-                VehicleList();
-            }
-
             UIManager.Instance.OpenPanel(UIManager.Instance.panels[3]);
         }
 
