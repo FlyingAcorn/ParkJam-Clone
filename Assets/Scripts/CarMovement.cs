@@ -196,12 +196,18 @@ public class CarMovement : MonoBehaviour
             transform.Translate(-_swipeDirection * 0.5f, Space.World);
             collision.transform.DOPunchRotation(
                 (region ? new Vector3(_swipeDirection.z, 0, _swipeDirection.x) : _swipeDirection) * 20, 0.5f).
-                OnPlay(() => { car.gotBumped = true;}).
-                OnComplete(() => { car.gotBumped = false;});
+                OnPlay(() =>
+                {
+                    SoundManager.Instance.PlaySfx(1);
+                    if (car == null) return;
+                    car.gotBumped = true;
+                    UIManager.Instance.EmojiPopupOnCrash(transform.position,car.transform.position);
+                }).
+                OnComplete(() => {if(car != null) car.gotBumped = false;});
             transform.DOPunchRotation(
                 (region ? _swipeDirection : new Vector3(_swipeDirection.z, 0, _swipeDirection.x)) * 20, 0.5f);
         }
-        SoundManager.Instance.PlaySfx(1);
+        SoundManager.Instance.PlaySfx(0);
         stopMovement = true;
     }
 
