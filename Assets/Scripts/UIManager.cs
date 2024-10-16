@@ -185,6 +185,7 @@ public class UIManager : Singleton<UIManager>
         panels[3].panelTexts[0].text = "Level " + GameManager.Instance.LevelNo;
         if (GameManager.Instance.LevelNo == 1) StartCoroutine(UIManager.Instance.TutorialSequence()); 
         GameManager.Instance.VehicleList();
+        SoundManager.Instance.PlayBackgroundSound(1);
         
     }
     public void LeaveGame()
@@ -203,7 +204,8 @@ public class UIManager : Singleton<UIManager>
 
     public void ToggleSound(bool tog)
     {
-        SoundManager.Instance.audioSource.mute = !tog;
+        SoundManager.Instance.sfxSource.mute = !tog;
+        SoundManager.Instance.backgroundSource.mute = !tog;
     }
 
     public void ToggleHaptics(bool tog)

@@ -78,7 +78,7 @@ public class GameManager : Singleton<GameManager>
 
         if (newState == GameState.MainMenu)
         {
-            
+            SoundManager.Instance.PlayBackgroundSound(0);
         }
 
         if (newState == GameState.Play)
