@@ -20,6 +20,7 @@ public class GameManager : Singleton<GameManager>
     public int totalCoins;
     public Level currentLevel;
     public List<CarMovement> parkedVehicles;
+    public Level mainMenuBackGround;
 
     public int CoinsAmount
     {
