@@ -65,7 +65,7 @@ public class WobblyRainbowText : MonoBehaviour
                     textComponent.UpdateVertexData(TMP_VertexDataUpdateFlags.Colors32);
                 }
             }
-            yield return new WaitForSeconds(0.25f);
+            yield return new WaitForSeconds(0.13f);
         }
     }
 }
