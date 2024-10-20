@@ -7,10 +7,14 @@ public class WobblyRainbowText : MonoBehaviour
     public float gradientSpeed;
     public TMP_Text textComponent;
     private float _totalTime;
+    [SerializeField] private bool wobble;
+    [SerializeField] private bool rainbow;
+    
     void Start()
     {
-        //StartCoroutine(ColorChange());
-        StartCoroutine(TextEffect());
+        if (wobble) StartCoroutine(TextEffect());
+        if (rainbow) StartCoroutine(ColorChange());
+        // ikisini beraber calisirmayı hallet.
     }
 
     private IEnumerator TextEffect()
@@ -58,14 +62,14 @@ public class WobblyRainbowText : MonoBehaviour
                 for (int j = 0; j < 4; j++)
                 {
                     var offset = i / textInfo.characterCount;
-                    color0 = textGradient.Evaluate((_totalTime + offset) % 1f);  
+                    color0 = textGradient.Evaluate((_totalTime+ offset) % 1f);  
                     _totalTime += Time.deltaTime;
                     newVertexColors[vertexIndex + j] = color0;
                     yield return new WaitForSeconds(gradientSpeed);
                     textComponent.UpdateVertexData(TMP_VertexDataUpdateFlags.Colors32);
                 }
             }
-            yield return new WaitForSeconds(0.13f);
+            yield return null;
         }
     }
 }
